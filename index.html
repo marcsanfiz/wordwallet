@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Wallet</title>
+    <link rel="stylesheet" href="asset/style.css">
+</head>
+<body>
+    <main class="app-container">
+        <!-- Agregar estas nuevas pantallas dentro del main, antes de la pantalla principal -->
+        <div id="login-screen" class="screen active">
+            <header class="app-header">
+                <img src="https://wordwallet.pages.dev/logo-light.png" alt="Logo claro" class="logo light-logo">
+                <img src="https://wordwallet.pages.dev/logo-dark.png" alt="Logo oscuro" class="logo dark-logo">
+                <h1>Word Wallet</h1>
+            </header>
+            <section class="content">
+                <form id="login-form" class="form">
+                    <label for="username">Nombre de usuario:</label>
+                    <input type="text" id="login-username" name="username" required aria-label="Nombre de usuario">
+                    
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="login-password" name="password" required>
+                    
+                    <div class="remember-user">
+                        <input type="checkbox" id="remember-user-checkbox">
+                        <label for="remember-user-checkbox">Recordar usuario</label>
+                    </div>
+                    
+                    <button type="submit" class="btn primary" aria-label="Iniciar sesión">Iniciar Sesión</button>
+                    <button type="button" onclick="showRegisterScreen()" class="btn secondary">Crear Nuevo Usuario</button>
+                    
+                    <div class="theme-toggle">
+                        <label for="theme-switch-login">Tema Oscuro</label>
+                        <input type="checkbox" id="theme-switch-login" onchange="toggleTheme()">
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <div id="register-screen" class="screen">
+            <header class="app-header">
+                <button onclick="showLoginScreen()" class="back-btn">← Volver</button>
+                <h2>Registro</h2>
+            </header>
+            <section class="content">
+                <form id="register-form" class="form">
+                    <label for="username">Nombre de usuario:</label>
+                    <input type="text" id="register-username" name="username" required minlength="3" maxlength="20" pattern="[A-Za-z0-9]+" title="Solo letras y números">
+                    
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="register-password" name="password" required minlength="6" maxlength="20" pattern="[A-Za-z0-9]+" title="Solo letras y números">
+                    
+                    <label for="animal-emoji">Selecciona tu emoji favorito:</label>
+                    <select id="animal-emoji" name="animal-emoji" required>
+                        <option value="🐶">🐶 Perro</option>
+                        <option value="🐱">🐱 Gato</option>
+                        <option value="🐰">🐰 Conejo</option>
+                        <option value="🐻">🐻 Oso</option>
+                        <option value="🐼">🐼 Panda</option>
+                    </select>
+                    
+                    <button type="submit" class="btn primary">Registrar Usuario</button>
+                    <button type="button" onclick="showLoginScreen()" class="btn secondary">Cancelar</button>
+                </form>
+            </section>
+        </div>
+
+        <!-- Cambiar la pantalla principal para que no sea active por defecto -->
+        <div id="home-screen" class="screen">
+            <header class="app-header">
+                <img src="https://wordwallet.pages.dev/logo-light.png" alt="Logo claro" class="logo light-logo">
+                <img src="https://wordwallet.pages.dev/logo-dark.png" alt="Logo oscuro" class="logo dark-logo">
+            </header>
+            <section class="content">
+                <button onclick="showAddWords()" class="btn primary">Añadir Palabras</button>
+                <button onclick="showExercises()" class="btn secondary">Ejercicios</button>
+                <button onclick="showStatistics()" class="btn tertiary">Estadísticas</button>
+                <div class="small-buttons-container">
+                    <button onclick="resetStats()" class="btn small reset">Restablecer Estadísticas</button>
+                    <button onclick="showEditUser()" class="btn small edit">Editar Usuario</button>
+                    <button onclick="showDebug()" class="btn small debug">Debug</button>
+                </div>
+                <div class="theme-toggle">
+                    <label for="theme-switch">Tema Oscuro</label>
+                    <input type="checkbox" id="theme-switch" onchange="toggleTheme()">
+                </div>
+                <button onclick="logout()" class="btn logout">Cerrar Sesión</button>
+            </section>
+        </div>
+
+        <!-- Página Añadir Palabras -->
+        <div id="add-words-screen" class="screen">
+            <header class="app-header">
+                <button onclick="goBack()" class="back-btn">← Volver</button>
+                <h2>Añadir Palabras</h2>
+            </header>
+            <section class="content">
+                <form id="word-form" class="form">
+                    <label for="word">Palabra:</label>
+                    <input type="text" id="word" name="word" required>
+
+                    <label for="translation">Traducción:</label>
+                    <input type="text" id="translation" name="translation" required>
+
+                    <label for="category">Categoría:</label>
+                    <input type="text" id="category" name="category" required>
+
+                    <button type="submit" class="btn primary" id="save-word-btn">
+                        <span id="save-word-text">Guardar</span>
+                        <span id="save-word-loader" class="hidden">Cargando...</span>
+                    </button>
+                </form>
+
+                <section id="import-section" class="import-section">
+                    <div id="import-loader" class="hidden">Cargando...</div>
+                    <label for="csv-file" class="btn secondary">Importar CSV</label>
+                    <input type="file" id="csv-file" accept=".csv" hidden>
+                    <button onclick="handleCSVImport(event)" class="btn tertiary">Subir</button>
+                    <button onclick="clearAllWords()" class="btn small">Borrar Todas</button>
+                </section>
+
+                <section id="word-list-section" class="word-list-section">
+                    <h3>Lista de Palabras</h3>
+                    <ul id="word-list" class="word-list"></ul>
+                </section>
+                
+
+                <!-- Botón para volver a la pantalla anterior -->
+                <button onclick="goBack()" class="btn secondary back-to-home">Volver a Inicio</button>
+            </section>
+        </div>
+
+        <!-- Página Ejercicios -->
+        <div id="exercises-screen" class="screen">
+            <header class="app-header">
+                <button onclick="goBack()" class="back-btn">← Volver</button>
+                <h2>Ejercicios</h2>
+            </header>
+            <section class="content">
+                <section id="exercise-settings" class="exercise-settings">
+                    <label for="categories">Categorías:</label>
+                    <select id="categories" multiple>
+                        <!-- Categorías se llenarán dinámicamente -->
+                    </select>
+
+                    <label for="quantity">Cantidad de Palabras:</label>
+                    <select id="quantity">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                    </select>
+
+                    <button onclick="startTest()" class="btn primary">Test</button>
+                    <button onclick="startWriting()" class="btn secondary">Escritura</button>
+                    <button onclick="startMixed()" class="btn tertiary">Mixto</button>
+                    <button onclick="startStudy()" class="btn quaternary">Estudiar</button>
+                    <button onclick="goBack()" class="btn small volver">Volver</button>
+                    <div id="category-error" class="error-message hidden">Por favor, selecciona al menos una categoría</div>
+                </section>
+
+                <section id="exercise-content" class="exercise-content hidden">
+                    <div id="question"></div>
+                    <div id="options" class="options"></div>
+                    <input type="text" id="answer-input" class="hidden" placeholder="Escribe la traducción...">
+                    <button onclick="checkAnswer()" id="submit-answer-btn" class="btn primary hidden">Enviar Respuesta</button>
+                    <div id="result-message"></div>
+                    <div id="progress-bar-container" class="progress-bar-container hidden">
+                        <div id="progress-bar" class="progress-bar"></div>
+                    </div>
+                </section>
+
+                <section id="exercise-summary" class="exercise-summary hidden">
+                    <h3>Resumen del Ejercicio</h3>
+                    <p id="summary-correct">Correctas: 0</p>
+                    <p id="summary-incorrect">Incorrectas: 0</p>
+                    <button onclick="repeatExercise()" class="btn primary">Repetir Ejercicio</button>
+                    <button onclick="goBack()" class="btn secondary">Volver a Inicio</button>
+                </section>
+
+                <!-- Añadir nueva sección para flashcards -->
+                <section id="flashcards-screen" class="flashcards-screen hidden">
+                    <div class="flashcard-container">
+                        <div class="flashcard" onclick="flipCard()">
+                            <div class="front">
+                                <span id="flashcard-word"></span>
+                            </div>
+                            <div class="back">
+                                <span id="flashcard-translation"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flashcard-controls">
+                        <button onclick="showPreviousCard()" class="btn secondary">Anterior</button>
+                        <button onclick="showNextCard()" class="btn primary">Siguiente</button>
+                        <button onclick="endFlashcards()" class="btn tertiary">Terminar</button>
+                    </div>
+                </section>
+
+                <!-- Añadir nueva sección para el modo normal -->
+                <section id="normal-study-screen" class="normal-study-screen hidden">
+                    <div class="study-card">
+                        <div class="word-translation-container">
+                            <div class="word">Palabra</div>
+                            <div class="translation">Traducción</div>
+                        </div>
+                    </div>
+                    <div class="study-controls">
+                        <button onclick="showPreviousStudyCard()" class="btn secondary">Atrás</button>
+                        <button onclick="showNextStudyCard()" class="btn primary">Siguiente</button>
+                        <button onclick="endNormalStudy()" class="btn tertiary">Terminar</button>
+                    </div>
+                </section>
+            </section>
+        </div>
+
+        <!-- Agregar el cuadro de diálogo para mostrar la respuesta correcta -->
+        <div id="correct-answer-dialog" class="dialog hidden">
+            <div class="dialog-content">
+                <p id="correct-answer-message"></p>
+                <button onclick="closeCorrectAnswerDialog()" class="btn primary">Aceptar</button>
+            </div>
+        </div>
+
+        <!-- Página Estadísticas -->
+        <div id="statistics-screen" class="screen">
+            <header class="app-header">
+                <button onclick="goBack()" class="back-btn">← Volver</button>
+                <h2>Estadísticas</h2>
+            </header>
+            <section class="content">
+                <section id="stats-content" class="stats-content">
+                    <h3>Palabras con Más Fallos</h3>
+                    <ul id="most-incorrect-words-list"></ul>
+                </section>
+                <button onclick="goBack()" class="btn secondary">Volver a Inicio</button>
+            </section>
+        </div>
+
+        <!-- Añade esta nueva pantalla para editar usuario -->
+        <div id="edit-user-screen" class="screen">
+            <header class="app-header">
+                <button onclick="goBack()" class="back-btn">← Volver</button>
+                <h2>Editar Usuario</h2>
+            </header>
+            <section class="content">
+                <form id="edit-user-form" class="form">
+                    <label for="edit-username">Nuevo nombre de usuario:</label>
+                    <input type="text" id="edit-username" name="username" required>
+                    
+                    <label for="edit-password">Nueva contraseña:</label>
+                    <input type="password" id="edit-password" name="password" required>
+                    
+                    <label for="edit-animal-emoji">Selecciona tu nuevo emoji favorito:</label>
+                    <select id="edit-animal-emoji" name="animal-emoji" required>
+                        <option value="🐶">🐶 Perro</option>
+                        <option value="🐱">🐱 Gato</option>
+                        <option value="🐰">🐰 Conejo</option>
+                        <option value="🐻">🐻 Oso</option>
+                        <option value="🐼">🐼 Panda</option>
+                    </select>
+                    
+                    <button type="submit" class="btn primary">Guardar Cambios</button>
+                </form>
+                <button onclick="goBack()" class="btn secondary">Volver a Inicio</button>
+            </section>
+        </div>
+
+        <!-- Añadir nueva pantalla de Debug antes del cierre de main -->
+        <div id="debug-screen" class="screen">
+            <header class="app-header debug-header">
+                <h2>Debug</h2>
+                <button onclick="goBack()" class="btn secondary">Volver</button>
+            </header>
+            <section class="content">
+                <div class="debug-table">
+                    <table id="debug-words-table">
+                        <thead>
+                            <tr>
+                                <th>Palabra</th>
+                                <th>Traducción</th>
+                                <th>Categoría</th>
+                                <th>Fallos</th>
+                                <th>Aciertos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="debug-words-body">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script src="asset/script.js"></script>
+    <!-- Añadir este diálogo modal antes del cierre de body -->
+    <div id="study-mode-dialog" class="modal-dialog hidden">
+        <div class="dialog-content">
+            <h3>Selecciona el modo de estudio</h3>
+            <div class="dialog-buttons">
+                <button onclick="selectStudyMode('flashcards')" class="btn primary">Flash Cards</button>
+                <button onclick="selectStudyMode('normal')" class="btn secondary">Normal</button>
+                <button onclick="closeStudyModeDialog()" class="btn tertiary">Volver</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
