@@ -1196,6 +1196,9 @@ function flipCard() {
 }
 
 function showNextCard() {
+    const flashcard = document.querySelector(".flashcard");
+    if (flashcard) flashcard.classList.remove("flipped");  // Reinicia el estado visual
+
     currentFlashcardIndex++;
     if (currentFlashcardIndex >= flashcards.length) {
         currentFlashcardIndex = 0; // Volver al inicio si llegamos al final
